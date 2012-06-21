@@ -62,3 +62,10 @@ set(cmph_sources "girepository/cmph/bdz.c"
 	"girepository/cmph/vstack.c"
 	"girepository/cmph/vstack.h")
 add_library(cmph SHARED ${cmph_sources})
+
+install(TARGETS cmph
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  PUBLIC_HEADER DESTINATION "include/${girepodir}"
+)
