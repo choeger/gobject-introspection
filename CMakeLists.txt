@@ -38,4 +38,5 @@ find_package(FFI REQUIRED)
 
 include(cmph.cmake)
 include(girepository.cmake)
+include(tools.cmake)
 

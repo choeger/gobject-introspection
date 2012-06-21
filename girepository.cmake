@@ -1,4 +1,4 @@
-set(girepodir "${includedir}/gobject-introspection-1.0/")
+set(girepodir "gobject-introspection-1.0/")
 
 set(girepo_headers "girepository/giarginfo.h"
 	"girepository/gibaseinfo.h"
@@ -17,7 +17,7 @@ set(girepo_headers "girepository/giarginfo.h"
 	"girepository/gistructinfo.h"
 	"girepository/gitypeinfo.h"
 	"girepository/gitypelib.h"
-	"girepository/gitypes.h	"
+	"girepository/gitypes.h"
 	"girepository/giunioninfo.h"
 	"girepository/givfuncinfo.h"
 	)
@@ -78,3 +78,12 @@ include_directories(${FFI_INCLUDE_DIRS})
 add_library(girepository_internals SHARED ${girepository_internals_sources})
 set_target_properties(girepository_internals PROPERTIES LINK_FLAGS "-Wl,-no-undefined -Wl,--enable-runtime-pseudo-reloc")
 target_link_libraries(girepository_internals girepository_gthash girepository_1_0 ${GLIB_LIBRARIES} ${FFI_LIBRARIES})
+
+set_target_properties(girepository_1_0 PROPERTIES PUBLIC_HEADER "${girepo_headers}")
+
+install(TARGETS girepository_1_0 girepository_gthash
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  PUBLIC_HEADER DESTINATION "include/${girepodir}"
+)
