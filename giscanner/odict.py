@@ -20,10 +20,10 @@
 
 """odict - an ordered dictionary"""
 
-from UserDict import DictMixin
+from collections import MutableMapping
 
 
-class odict(DictMixin):
+class odict(MutableMapping):
 
     def __init__(self):
         self._items = {}

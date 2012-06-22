@@ -26,6 +26,7 @@ import subprocess
 import shutil
 import tempfile
 
+from subprocess import CalledProcessError
 from .gdumpparser import IntrospectionBinary
 from . import utils
 
@@ -155,14 +156,14 @@ class DumpCompiler(object):
 
         try:
             self._compile(o_path, c_path)
-        except CompilerError, e:
+        except e as CompilerError:
             if not utils.have_debug_flag('save-temps'):
                 shutil.rmtree(tmpdir)
             raise SystemExit('compilation of temporary binary failed:' + str(e))
 
         try:
             self._link(bin_path, o_path)
-        except LinkerError, e:
+        except e as LinkerError:
             if not utils.have_debug_flag('save-temps'):
                 shutil.rmtree(tmpdir)
             raise SystemExit('linking of temporary binary failed: ' + str(e))
@@ -203,12 +204,12 @@ class DumpCompiler(object):
                     "Could not find c source file: %s" % (source, ))
         args.extend(list(sources))
         if not self._options.quiet:
-            print "g-ir-scanner: compile: %s" % (
-                subprocess.list2cmdline(args), )
+            print("g-ir-scanner: compile: %s" % (
+                subprocess.list2cmdline(args), ))
             sys.stdout.flush()
         try:
             subprocess.check_call(args)
-        except subprocess.CalledProcessError, e:
+        except e as CalledProcessError:
             raise CompilerError(e)
 
     def _link(self, output, *sources):
@@ -252,14 +253,14 @@ class DumpCompiler(object):
             self._add_link_external_args(args)
 
         if not self._options.quiet:
-            print "g-ir-scanner: link: %s" % (
-                subprocess.list2cmdline(args), )
+            print("g-ir-scanner: link: %s" % (
+                subprocess.list2cmdline(args), ))
             sys.stdout.flush()
         try:
             if os.name == 'nt':
                 os.mkdir(os.path.join(os.path.dirname(output), '.libs'))
             subprocess.check_call(args)
-        except subprocess.CalledProcessError, e:
+        except e as CalledProcessError:
             raise LinkerError(e)
 
     def _add_link_internal_args(self, args, libtool):

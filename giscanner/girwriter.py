@@ -124,7 +124,7 @@ and/or use gtk-doc annotations. ''')
         elif isinstance(node, ast.Constant):
             self._write_constant(node)
         else:
-            print 'WRITER: Unhandled node', node
+            print('WRITER: Unhandled node %s' % (node,))
 
     def _append_version(self, node, attrs):
         if node.version:

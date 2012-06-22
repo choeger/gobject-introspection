@@ -62,7 +62,7 @@ PyTypeObject Py##cname##_Type = {             \
 }
 
 #define REGISTER_TYPE(d, name, type)	      \
-    type.ob_type = &PyType_Type;              \
+    Py_TYPE((&type)) = &PyType_Type;              \
     type.tp_alloc = PyType_GenericAlloc;      \
     type.tp_new = PyType_GenericNew;          \
     if (PyType_Ready (&type))                 \
