@@ -31,12 +31,42 @@ set(SHLIB_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+add_definitions(-DHAVE_CONFIG_H)
 
 #dependencies
 find_package(GLIB REQUIRED)
 find_package(FFI REQUIRED)
 
+# Find Python executable  
+find_package(PythonInterp REQUIRED)
+find_package(PythonLibs REQUIRED)
+
+if(NOT PYTHONLIBS_FOUND OR NOT PYTHON_EXECUTABLE)
+  message(SEND_ERROR "You need Python to build the dbus python bindings")
+endif(NOT PYTHONLIBS_FOUND OR NOT PYTHON_EXECUTABLE)
+
+# The code below prints the Python extension for the current system
+set(get_python_suffix "import imp ; print(list(filter(lambda s : s[1] == 'rb' and s[0][0] == '.', imp.get_suffixes()))[0][0])")
+
+execute_process(
+  COMMAND ${PYTHON_EXECUTABLE} -c "${get_python_suffix}"
+  OUTPUT_VARIABLE _modsuffix
+)
+string(REPLACE "\n" "" _modsuffix ${_modsuffix}) 
+message(STATUS "Python module suffix is: ${_modsuffix}")
+
+# The code below returns the site-packages directory for the current system
+set(get_site_package_dir "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
+execute_process(
+  COMMAND ${PYTHON_EXECUTABLE} -c "${get_site_package_dir}"
+  OUTPUT_VARIABLE site_pkg
+)
+string(REPLACE "\n" "" site_pkg ${site_pkg}) 
+message(STATUS "Python module path is: ${site_pkg}")
+
 include(cmph.cmake)
 include(girepository.cmake)
 include(tools.cmake)
+include(giscanner.cmake)
+include(gir.cmake)
 

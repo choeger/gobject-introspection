@@ -50,3 +50,13 @@
 #cmakedefine GIR_DIR "@GIR_DIR@"
 
 #cmakedefine SHLIB_SUFFIX "@SHLIB_SUFFIX@"
+
+
+#ifdef USE_DL_IMPORT
+#define DL_IMPORT(RTYPE) __declspec(dllimport) RTYPE
+#define DL_EXPORT(RTYPE) __declspec(dllexport) RTYPE
+#endif
+#ifdef USE_DL_EXPORT
+#define DL_IMPORT(RTYPE) __declspec(dllexport) RTYPE
+#define DL_EXPORT(RTYPE) __declspec(dllexport) RTYPE
+#endif
