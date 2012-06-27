@@ -41,13 +41,19 @@
 
 #include <glib-object.h>
 
+#if PY_MAJOR_VERSION >= 3
+  #define PyInt_FromLong(x) PyLong_FromLong(x)
+  #define PyString_FromString(x) PyBytes_FromString(x)
+  #define PyString_AsString(x) PyBytes_AsString(x)
+  #define PyString_Check(x) PyBytes_Check(x)
+#endif
+
 DL_EXPORT(void) init_giscanner(void);
 
 #define NEW_CLASS(ctype, name, cname)	      \
 static const PyMethodDef _Py##cname##_methods[];    \
 PyTypeObject Py##cname##_Type = {             \
     PyObject_HEAD_INIT(NULL)                  \
-    0,			                      \
     "scanner." name,                          \
     sizeof(ctype),     	              \
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	      \
@@ -62,7 +68,7 @@ PyTypeObject Py##cname##_Type = {             \
 }
 
 #define REGISTER_TYPE(d, name, type)	      \
-    type.ob_type = &PyType_Type;              \
+    Py_TYPE((&type)) = &PyType_Type;              \
     type.tp_alloc = PyType_GenericAlloc;      \
     type.tp_new = PyType_GenericNew;          \
     if (PyType_Ready (&type))                 \
@@ -723,20 +729,67 @@ pygi_collect_attributes (PyObject *self,
 
 /* Module */
 
+
+struct module_state {
+    PyObject *error;
+};
+
+#if PY_MAJOR_VERSION >= 3
+#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
+#else
+#define GETSTATE(m) (&_state)
+static struct module_state _state;
+#endif
+
 static const PyMethodDef pyscanner_functions[] = {
   { "collect_attributes",
     (PyCFunction) pygi_collect_attributes, METH_VARARGS },
   { NULL, NULL, 0, NULL }
 };
 
+#if PY_MAJOR_VERSION >= 3
+
+static int giscanner_traverse(PyObject *m, visitproc visit, void *arg) {
+    Py_VISIT(GETSTATE(m)->error);
+    return 0;
+}
+
+static int giscanner_clear(PyObject *m) {
+    Py_CLEAR(GETSTATE(m)->error);
+    return 0;
+}
+
+static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+        "giscanner._giscanner",
+        NULL,
+        sizeof(struct module_state),
+        (PyMethodDef*)pyscanner_functions,
+        NULL,
+        giscanner_traverse,
+        giscanner_clear,
+        NULL
+};
+
+PyMODINIT_FUNC
+PyInit__giscanner(void)
+
+#else
+
 DL_EXPORT(void)
 init_giscanner(void)
+#endif
 {
     PyObject *m, *d;
+	void *dbg;
     gboolean is_uninstalled;
 
     g_type_init ();
+	
 
+	#if PY_MAJOR_VERSION >= 3
+    m = PyModule_Create(&moduledef);
+	#else
     /* Hack to avoid having to create a fake directory structure; when
      * running uninstalled, the module will be in the top builddir,
      * with no _giscanner prefix.
@@ -744,7 +797,8 @@ init_giscanner(void)
     is_uninstalled = g_getenv ("UNINSTALLED_INTROSPECTION_SRCDIR") != NULL;
     m = Py_InitModule (is_uninstalled ? "_giscanner" : "giscanner._giscanner",
 		       (PyMethodDef*)pyscanner_functions);
-    d = PyModule_GetDict (m);
+	#endif
+	d = PyModule_GetDict (m);
 
     PyGISourceScanner_Type.tp_init = (initproc)pygi_source_scanner_init;
     PyGISourceScanner_Type.tp_methods = (PyMethodDef*)_PyGISourceScanner_methods;
@@ -752,7 +806,11 @@ init_giscanner(void)
 
     PyGISourceSymbol_Type.tp_getset = (PyGetSetDef*)_PyGISourceSymbol_getsets;
     REGISTER_TYPE (d, "SourceSymbol", PyGISourceSymbol_Type);
-
+	
     PyGISourceType_Type.tp_getset = (PyGetSetDef*)_PyGISourceType_getsets;
     REGISTER_TYPE (d, "SourceType", PyGISourceType_Type);
+    
+	#if PY_MAJOR_VERSION >= 3
+    return m;
+	#endif
 }
