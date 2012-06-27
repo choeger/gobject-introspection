@@ -124,7 +124,7 @@ usage is void (*_gtk_reserved1)(void);"""
     def _get_validate_parameter_name(self, parent, param_name, origin):
         try:
             param = parent.get_parameter(param_name)
-        except ValueError, e:
+        except ValueError as e:
             param = None
         if param is None:
             if isinstance(origin, ast.Parameter):
@@ -871,7 +871,7 @@ the ones that failed to resolve removed."""
             for parent in node.parent_chain:
                 try:
                     self._transformer.resolve_type(parent)
-                except ValueError, e:
+                except ValueError as e:
                     continue
                 target = self._transformer.lookup_typenode(parent)
                 if target:
@@ -907,7 +907,7 @@ the ones that failed to resolve removed."""
 
             try:
                 no_uscore_prefixed = self._transformer.strip_identifier(type_name)
-            except TransformerException, e:
+            except TransformerException as e:
                 message.warn(e)
                 no_uscore_prefixed = None
 
