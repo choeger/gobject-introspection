@@ -257,8 +257,8 @@ def extract_filenames(args):
 
 def create_namespace(options):
     if options.strip_prefix:
-        print """g-ir-scanner: warning: Option --strip-prefix has been deprecated;
-see --identifier-prefix and --symbol-prefix."""
+        print("""g-ir-scanner: warning: Option --strip-prefix has been deprecated;
+see --identifier-prefix and --symbol-prefix.""")
         options.identifier_prefixes.append(options.strip_prefix)
 
     # We do this dance because the empty list has different semantics from
@@ -360,7 +360,7 @@ def write_output(data, options):
         os.unlink(temp_f_name)
         try:
             shutil.move(main_f_name, options.output)
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.EPERM:
                 os.unlink(main_f_name)
                 return 0
@@ -369,12 +369,12 @@ def write_output(data, options):
     else:
         try:
             output = open(options.output, "w")
-        except IOError, e:
+        except IOError as e:
             _error("opening output for writing: %s" % (e.strerror, ))
 
     try:
         output.write(data)
-    except IOError, e:
+    except IOError as e:
         _error("while writing output: %s" % (e.strerror, ))
 
 def scanner_main(args):
