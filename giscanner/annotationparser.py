@@ -250,7 +250,7 @@ class DocTag(object):
         if value is None:
             return
 
-        for name, v in value.all().iteritems():
+        for name, v in value.all().items():
             if name in [OPT_ARRAY_ZERO_TERMINATED, OPT_ARRAY_FIXED_SIZE]:
                 try:
                     int(v)
@@ -318,7 +318,7 @@ class DocTag(object):
             if value:
                 if type(value) != str:
                     value = ' '.join((serialize_one(k, v, '%s=%s', '%s')
-                                      for k, v in value.all().iteritems()))
+                                      for k, v in value.all().items()))
                 return fmt % (option, value)
             else:
                 return fmt2 % (option, )
@@ -860,10 +860,10 @@ class AnnotationParser(object):
         else:
             comment_block.comment = ''
 
-        for tag in comment_block.tags.itervalues():
+        for tag in comment_block.tags.values():
             self._clean_comment_block_part(tag)
 
-        for param in comment_block.params.itervalues():
+        for param in comment_block.params.values():
             self._clean_comment_block_part(param)
 
         # Validate and store block.
