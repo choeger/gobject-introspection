@@ -262,9 +262,9 @@ class SourceScanner(object):
         return self._scanner.get_comments()
 
     def dump(self):
-        print '-'*30
+        print('-'*30)
         for symbol in self._scanner.get_symbols():
-            print symbol.ident, symbol.base_type.name, symbol.type
+            print(symbol.ident, symbol.base_type.name, symbol.type)
 
     # Private
 
