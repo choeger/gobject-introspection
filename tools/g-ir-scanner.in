@@ -21,7 +21,7 @@
 
 import os
 import sys
-import __builtin__
+import builtins
 
 debug = os.getenv('GI_SCANNER_DEBUG', '').split(',')
 if debug:
@@ -34,14 +34,20 @@ if debug:
             pydevd.settrace()
     else:
         def on_exception(exctype, value, tb):
-            print "Caught exception: %r %r" % (exctype, value)
+            print("Caught exception: %r %r") % (exctype, value)
             import pdb
             pdb.pm()
         sys.excepthook = on_exception
 
 if os.name == 'nt':
-    datadir = os.path.join(os.path.dirname(__file__), '..', 'share')
-    pylibdir = os.path.join(os.path.dirname(__file__), '..', 'lib', 'gobject-introspection')
+    _datadir = os.getenv('GIR_SCANNER_DATA_DIR', None)
+    _pylibdir = os.getenv('GIR_SCANNER_PYLIB_DIR', None)	
+    if (_datadir is not None) and (_pylibdir is not None):
+        datadir = _datadir
+        pylibdir = _pylibdir
+    else:
+        datadir = os.path.join(os.path.dirname(__file__), '..', 'share')
+        pylibdir = os.path.join(os.path.dirname(__file__), '..', 'lib', 'gobject-introspection')
 else:
     datadir = "@datarootdir@"
     pylibdir = os.path.join('@libdir@', 'gobject-introspection')
@@ -50,7 +56,7 @@ srcdir = os.getenv('UNINSTALLED_INTROSPECTION_SRCDIR', None)
 if srcdir is not None:
     pylibdir = srcdir
 
-__builtin__.__dict__['DATADIR'] = datadir
+builtins.__dict__['DATADIR'] = datadir
 sys.path.insert(0, pylibdir)
 
 from giscanner.scannermain import scanner_main
