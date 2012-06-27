@@ -437,10 +437,10 @@ functions via get_by_symbol()."""
         return iter(self._names)
 
     def iteritems(self):
-        return self._names.iteritems()
+        return self._names.items()
 
     def itervalues(self):
-        return self._names.itervalues()
+        return self._names.values()
 
     def get(self, name):
         return self._names.get(name)
