@@ -2663,7 +2663,7 @@ parse_include (GMarkupParseContext *context,
   return TRUE;
 }
 
-extern GLogLevelFlags logged_levels;
+GLogLevelFlags logged_levels;
 
 static void
 start_element_handler (GMarkupParseContext *context,

@@ -115,7 +115,7 @@ out:
   return success;
 }
 
-GLogLevelFlags logged_levels;
+extern GLogLevelFlags logged_levels;
 
 static void log_handler (const gchar *log_domain,
 			 GLogLevelFlags log_level,
