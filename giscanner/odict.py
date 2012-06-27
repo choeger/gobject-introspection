@@ -20,10 +20,10 @@
 
 """odict - an ordered dictionary"""
 
-from UserDict import DictMixin
+from collections import MutableMapping
 
 
-class odict(DictMixin):
+class odict(MutableMapping):
 
     def __init__(self):
         self._items = {}
@@ -34,12 +34,18 @@ class odict(DictMixin):
             self._keys.append(key)
         self._items[key] = value
 
-    def __getitem__(self, key):
+    def __getitem__(self, key):        
         return self._items[key]
 
     def __delitem__(self, key):
         del self._items[key]
         self._keys.remove(key)
 
+    def __len__(self):
+        return len(self._keys)
+	
+    def __iter__(self):
+        return self._keys.__iter__()
+	
     def keys(self):
         return self._keys[:]
