@@ -23,7 +23,7 @@ from __future__ import with_statement
 import os
 
 from contextlib import contextmanager
-from cStringIO import StringIO
+from io import StringIO
 from xml.sax.saxutils import escape, quoteattr
 
 from .libtoolimporter import LibtoolImporter
@@ -95,10 +95,10 @@ class XMLWriter(object):
             tag_name, attributes, self._indent,
             self._indent_char,
             len(tag_name) + 2)
-        self.write_line(u'<%s%s>' % (tag_name, attrs))
+        self.write_line("<%s%s>" % (tag_name, attrs))
 
     def _close_tag(self, tag_name):
-        self.write_line(u'</%s>' % (tag_name, ))
+        self.write_line("</%s>" % (tag_name, ))
 
     # Public API
 
@@ -113,7 +113,7 @@ class XMLWriter(object):
     def get_xml(self):
         return self._data.getvalue()
 
-    def write_line(self, line=u'', indent=True, do_escape=False):
+    def write_line(self, line='', indent=True, do_escape=False):
         if isinstance(line, str):
             line = line.decode('utf-8')
         assert isinstance(line, unicode)
@@ -133,13 +133,13 @@ class XMLWriter(object):
     def write_tag(self, tag_name, attributes, data=None):
         if attributes is None:
             attributes = []
-        prefix = u'<%s' % (tag_name, )
+        prefix = '<%s' % (tag_name, )
         if data is not None:
             if isinstance(data, str):
                 data = data.decode('UTF-8')
-            suffix = u'>%s</%s>' % (escape(data), tag_name)
+            suffix = '>%s</%s>' % (escape(data), tag_name)
         else:
-            suffix = u'/>'
+            suffix = '/>'
         attrs = collect_attributes(
             tag_name, attributes,
             self._indent,
