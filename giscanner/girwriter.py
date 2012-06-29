@@ -96,7 +96,7 @@ and/or use gtk-doc annotations. ''')
                     return 1
                 else:
                     return cmp(a, b)
-            for node in sorted(namespace.itervalues(), cmp=nscmp):
+            for node in sorted(namespace.itervalues(), key=lambda x : (not isinstance(x, ast.Alias), x.name if (isinstance(x,ast.Alias)) else x)):
                 self._write_node(node)
 
     def _write_node(self, node):
