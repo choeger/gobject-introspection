@@ -117,7 +117,7 @@ class GDumpParser(object):
                 self._introspect_type(child)
 
         # Pair up boxed types and class records
-        for name, boxed in self._boxed_types.iteritems():
+        for name, boxed in self._boxed_types.items():
             self._pair_boxed_type(boxed)
         for node in self._namespace.itervalues():
             if isinstance(node, (ast.Class, ast.Interface)):
