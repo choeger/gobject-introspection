@@ -217,7 +217,7 @@ None."""
         """Return an iterator over all included namespaces; the
 currently-scanned namespace is first."""
         yield self._namespace
-        for ns in self._includes.itervalues():
+        for ns in self._includes.values():
             yield ns
 
     def _sort_matches(self, x, y):
@@ -809,7 +809,7 @@ Note that type resolution may not succeed."""
         # which has nominal namespace of "Meta", but a few classes are
         # "Mutter".  We don't export that data in introspection currently.
         # Basically the library should be fixed, but we'll hack around it here.
-        for namespace in self._includes.itervalues():
+        for namespace in self._includes.values():
             target = namespace.get_by_ctype(pointer_stripped)
             if target:
                 typeval.target_giname = '%s.%s' % (namespace.name, target.name)
