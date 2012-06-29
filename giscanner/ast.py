@@ -116,14 +116,14 @@ in contrast to the other create_type() functions."""
         assert self.target_giname is not None
         return self.target_giname.split('.')[1]
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if self.target_fundamental:
-            return cmp(self.target_fundamental, other.target_fundamental)
+            return self.target_fundamental == other.target_fundamental
         if self.target_giname:
-            return cmp(self.target_giname, other.target_giname)
+            return self.target_giname == other.target_giname
         if self.target_foreign:
-            return cmp(self.target_foreign, other.target_foreign)
-        return cmp(self.ctype, other.ctype)
+            return self.target_foreign == other.target_foreign
+        return self.ctype == other.ctype
 
     def is_equiv(self, typeval):
         """Return True if the specified types are compatible at
@@ -212,6 +212,7 @@ TYPE_STRING = Type(target_fundamental='utf8', ctype='gchar*')
 TYPE_FILENAME = Type(target_fundamental='filename', ctype='gchar*')
 
 TYPE_VALIST = Type(target_fundamental='va_list', ctype='va_list')
+TYPE_VALIST_PTR = Type(target_fundamental='va_list', ctype='va_list')
 
 BASIC_GIR_TYPES = [TYPE_BOOLEAN, TYPE_INT8, TYPE_UINT8, TYPE_INT16,
                    TYPE_UINT16, TYPE_INT32, TYPE_UINT32, TYPE_INT64,
