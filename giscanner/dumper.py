@@ -181,7 +181,7 @@ class DumpCompiler(object):
         proc = subprocess.Popen(
             [self._pkgconfig_cmd, flag] + self._packages,
             stdout=subprocess.PIPE)
-        return proc.communicate()[0].split()
+        return map(lambda x : x.decode(), proc.communicate()[0].split())
 
     def _compile(self, output, *sources):
         # Not strictly speaking correct, but easier than parsing shell
@@ -203,6 +203,7 @@ class DumpCompiler(object):
                 raise CompilerError(
                     "Could not find c source file: %s" % (source, ))
         args.extend(list(sources))
+
         if not self._options.quiet:
             print("g-ir-scanner: compile: %s" % (
                 subprocess.list2cmdline(args), ))
