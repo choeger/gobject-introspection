@@ -37,6 +37,9 @@ add_definitions(-DHAVE_CONFIG_H -g)
 find_package(GLIB REQUIRED)
 find_package(FFI REQUIRED)
 
+include_directories(${FFI_INCLUDE_DIR} ${GLIB_INCLUDE_DIR})
+link_directories(${FFI_LIBRARY_DIRS} ${GLIB_LIBRARY_DIRS})
+
 # Find Python executable  
 find_package(PythonInterp REQUIRED)
 find_package(PythonLibs REQUIRED)

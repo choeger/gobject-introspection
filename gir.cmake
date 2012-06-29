@@ -13,12 +13,39 @@ set(static_gir_sources
 
 include(introspection.cmake)
 	
-file(GLOB glib_includes $(GLIB_INCLUDEDIR)/glib/*.h)
-set(GLib-2.0_FILES $(GLIB_LIBDIR)/glib-2.0/include/glibconfig.h $(GLIB_INCLUDEDIR)/gobject/glib-types.h gir/glib-2.0.c ${glib_includes})
+file(GLOB glib_includes ${GLIB_INCLUDE_DIR}/glib/*.h)
+set(GLib-2.0_FILES 
+		${GLIB_INCLUDE_DIR}/gobject/glib-types.h 
+		${GLIB_LIBRARY_DIR}/glib-2.0/include/glibconfig.h 
+		${GLIB_INCLUDE_DIR}/gobject/glib-types.h 
+		${CMAKE_CURRENT_SOURCE_DIR}/gir/glib-2.0.c 
+		${glib_includes})
+set(GLib-2.0_LIBS ":${GLIB_LIBRARY}" ":${GOBJECT_LIBRARY}") #: prefix is probably not portable ...
+set(GLib-2.0_SCANNERFLAGS 
+			--external-library
+            --reparse-validate
+            --identifier-prefix=G
+            --symbol-prefix=g
+            --symbol-prefix=glib
+            --c-include="glib.h"
+)
+set(GLib-2.0_PACKAGES glib-2.0)
+
+find_path(intl libintl.h)
+
+set(GLib-2.0_CFLAGS
+            -I${GLIB_INCLUDE_DIR}
+            -I${GLIB_LIBDIR}/glib-2.0/include
+            -DGETTEXT_PACKAGE=Dummy
+            -DGLIB_COMPILATION
+            -D__G_I18N_LIB_H__
+			-I${intl}
+)
+
 target_scan_gir(GLib-2.0)
 
 set(GObject-2.0_FILES gir/gobject-2.0.c)
 target_scan_gir(GObject-2.0)
 		
-target_add_gir(static_gir "gir/" GObject-2.0.gir GLib-2.0.gir ${static_gir_sources})
+target_add_gir(static_gir "gir/" ${GLib-2.0_gir} ${static_gir_sources})
 
