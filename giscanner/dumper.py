@@ -260,7 +260,7 @@ class DumpCompiler(object):
             if os.name == 'nt':
                 os.mkdir(os.path.join(os.path.dirname(output), '.libs'))
             subprocess.check_call(args)
-        except CalledProcessError e:
+        except CalledProcessError as e:
             raise LinkerError(e)
 
     def _add_link_internal_args(self, args, libtool):
