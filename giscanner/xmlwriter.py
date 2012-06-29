@@ -21,6 +21,7 @@
 from __future__ import with_statement
 
 import os
+import sys
 
 from contextlib import contextmanager
 from io import StringIO
@@ -114,9 +115,11 @@ class XMLWriter(object):
         return self._data.getvalue()
 
     def write_line(self, line='', indent=True, do_escape=False):
-        if isinstance(line, str):
-            line = line.decode('utf-8')
-        assert isinstance(line, unicode)
+        if sys.version < '3':
+            if isinstance(line, str):
+                line = line.decode('utf-8')
+            assert isinstance(line, unicode)
+        
         if do_escape:
             line = escape(line.encode('utf-8')).decode('utf-8')
         if indent:
