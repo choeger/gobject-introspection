@@ -43,9 +43,9 @@
 
 #if PY_MAJOR_VERSION >= 3
   #define PyInt_FromLong(x) PyLong_FromLong(x)
-  #define PyString_FromString(x) PyBytes_FromString(x)
+  #define PyString_FromString(x) PyUnicode_FromString(x)
   #define PyString_AsString(x) PyBytes_AsString(x)
-  #define PyString_Check(x) PyBytes_Check(x)
+  #define PyString_Check(x) PyUnicode_Check(x)
 #endif
 
 DL_EXPORT(void) init_giscanner(void);
@@ -435,6 +435,7 @@ pygi_source_scanner_parse_file (PyGISourceScanner *self,
 #else
 #error This Python version not handled
 #endif
+
     HMODULE msvcrxx;
     intptr_t (*p__get_osfhandle) (int);
     HANDLE handle;
@@ -548,11 +549,11 @@ pygi_source_scanner_get_comments (PyGISourceScanner *self)
 {
   GSList *l, *comments;
   PyObject *list;
+  PyObject* foo; 
   int i = 0;
 
   comments = gi_source_scanner_get_comments (self->scanner);
   list = PyList_New (g_slist_length (comments));
-
   for (l = comments; l; l = l->next)
     {
       GISourceComment *comment = l->data;
@@ -749,16 +750,6 @@ static const PyMethodDef pyscanner_functions[] = {
 
 #if PY_MAJOR_VERSION >= 3
 
-static int giscanner_traverse(PyObject *m, visitproc visit, void *arg) {
-    Py_VISIT(GETSTATE(m)->error);
-    return 0;
-}
-
-static int giscanner_clear(PyObject *m) {
-    Py_CLEAR(GETSTATE(m)->error);
-    return 0;
-}
-
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "giscanner._giscanner",
@@ -766,8 +757,8 @@ static struct PyModuleDef moduledef = {
         sizeof(struct module_state),
         (PyMethodDef*)pyscanner_functions,
         NULL,
-        giscanner_traverse,
-        giscanner_clear,
+        NULL,
+		NULL,
         NULL
 };
 
