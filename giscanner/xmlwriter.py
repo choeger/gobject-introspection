@@ -122,13 +122,17 @@ class XMLWriter(object):
         
         if do_escape:
             line = escape(line.encode('utf-8')).decode('utf-8')
+        
+        if sys.version < '3':
+            line = line.encode('utf-8')
+
         if indent:
             self._data.write('%s%s%s' % (
                     self._indent_char * self._indent,
-                    line.encode('utf-8'),
+                    line,
                     self._newline_char))
         else:
-            self._data.write('%s%s' % (line.encode('utf-8'), self._newline_char))
+            self._data.write('%s%s' % (line, self._newline_char))
 
     def write_comment(self, text):
         self.write_line('<!-- %s -->' % (text, ))
