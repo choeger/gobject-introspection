@@ -4,13 +4,16 @@ macro(target_add_gir name dir)
 	
   foreach(gir IN LISTS infiles)
 	message(STATUS "Now on ${gir}")
+
 	get_filename_component(f "${gir}" ABSOLUTE)
 	get_filename_component(include_dir "${f}" PATH)	
     get_filename_component(base ${f} NAME_WE)
+	message(STATUS "name: ${base} dependencies: ${${base}_DEPENDENCIES}")
     add_custom_command(
 	  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${base}.typelib"
-	  COMMAND g-ir-compiler ARGS ${f} -o "${CMAKE_CURRENT_BINARY_DIR}/${base}.typelib" --includedir=${include_dir}
+	  COMMAND g-ir-compiler ARGS ${f} --includedir=${CMAKE_CURRENT_BINARY_DIR} -o "${CMAKE_CURRENT_BINARY_DIR}/${base}.typelib" --includedir=${include_dir}
 	  MAIN_DEPENDENCY ${f}
+	  DEPENDS ${${base}_DEPENDENCIES}
 	  COMMENT "Compiling gir: ${base}"
 	)
 	list(APPEND outfiles "${CMAKE_CURRENT_BINARY_DIR}/${base}.typelib")
@@ -53,19 +56,21 @@ macro(target_scan_gir name)
 
 	foreach(incl ${${name}_INCLUDES})
 	    list(APPEND includes "--include=${incl}")
+		list(APPEND ${name}_DEPENDENCIES "${CMAKE_CURRENT_BINARY_DIR}/${name}.gir")
 	endforeach(incl ${${name}_INCLUDES})
 
 	foreach(exp ${${name}_EXPORT_PACKAGES})
 	    list(APPEND export_packages "--pkg-export=${exp}")
 	endforeach(exp ${${name}_EXPORT_PACKAGES})
-
+    
+	message(STATUS "name: ${name} dependencies: ${${name}_DEPENDENCIES}")
     add_custom_command(
 	  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${name}.gir"
 	  COMMAND ${PYTHON_EXECUTABLE} ARGS g-ir-scanner.py --namespace=${namespace}
-		--nsversion=${version} 	${packages} ${includes} ${export_packages} ${program} ${libraries} 
-		${${name}_SCANNERFLAGS} ${${name}_CFLAGS} ${${name}_LDFLAGS} ${${name}_FILES} "--output=${CMAKE_CURRENT_BINARY_DIR}/${name}.gir"
-	  DEPENDS ${${name}_FILES}
-	  COMMENT "Compiling gir: ${name}"
+		--nsversion=${version} 	${packages} ${includes} ${export_packages} ${program} ${libraries}
+		${${name}_SCANNERFLAGS} ${${name}_CFLAGS} ${${name}_LDFLAGS} ${${name}_FILES} "--output=${CMAKE_CURRENT_BINARY_DIR}/${name}.gir"		
+	  DEPENDS ${${name}_FILES} ${${name}_DEPENDENCIES}
+	  COMMENT "Scanning gir: ${name}"
 	)
 	
 	set(${name}_gir "${CMAKE_CURRENT_BINARY_DIR}/${name}.gir")

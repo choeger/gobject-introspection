@@ -45,7 +45,29 @@ set(GLib-2.0_CFLAGS
 target_scan_gir(GLib-2.0)
 
 set(GObject-2.0_FILES gir/gobject-2.0.c)
-target_scan_gir(GObject-2.0)
 		
-target_add_gir(static_gir "gir/" ${GLib-2.0_gir} ${static_gir_sources})
+file(GLOB gobject_includes ${GLIB_INCLUDE_DIR}/gobject/*.h)
+set(GObject-2.0_FILES 
+		${CMAKE_CURRENT_SOURCE_DIR}/gir/gobject-2.0.c
+		${glib_includes})
+set(GObject-2.0_LIBS ":${GOBJECT_LIBRARY}") #: prefix is probably not portable ...
+set(GObject-2.0_SCANNERFLAGS 
+			--external-library
+            --reparse-validate
+            --identifier-prefix=G
+            --symbol-prefix=g
+            --symbol-prefix=glib
+            --c-include="glib-object.h"
+)
+set(GLib-2.0_CFLAGS
+            -DGOBJECT_COMPILATION
+            -I${GLIB_INCLUDE_DIR}
+            -I${GLIB_LIBDIR}/glib-2.0/include
+)
+set(GObject-2.0_PACKAGES gobject-2.0)
+set(GObject-2.0_INCLUDES GLib-2.0)
 
+target_scan_gir(GObject-2.0)
+
+list(APPEND DBusGLib-1.0_DEPENDENCIES "${CMAKE_CURRENT_BINARY_DIR}/GObject-2.0.gir")
+target_add_gir(static_gir "gir/" ${GLib-2.0_gir} ${static_gir_sources})
