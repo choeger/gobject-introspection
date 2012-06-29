@@ -509,11 +509,8 @@ GIName.  It's possible for nodes to contain or point to other nodes."""
         assert self.namespace is not None
         return Type(target_giname=('%s.%s' % (self.namespace.name, self.name)))
 
-    def __cmp__(self, other):
-        nscmp = cmp(self.namespace, other.namespace)
-        if nscmp != 0:
-            return nscmp
-        return cmp(self.name, other.name)
+    def __lt__(self, other):
+        return (self.namespace, self.name) < (other.namespace, other.name)
 
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self.name)
