@@ -215,9 +215,10 @@ def test_codegen(optstring):
 def process_options(output, allowed_flags):
     for option in output.split():
         for flag in allowed_flags:
-            if not option.startswith(flag):
+            str_opt = option.decode()
+            if not str_opt.startswith(flag):
                 continue
-            yield option
+            yield str_opt
             break
 
 def process_packages(options, packages):
@@ -346,12 +347,12 @@ def write_output(data, options):
         output = sys.stdout
     elif options.reparse_validate_gir:
         main_f, main_f_name = tempfile.mkstemp(suffix='.gir')
-        main_f = os.fdopen(main_f, 'w')
+        main_f = os.fdopen(main_f, 'w', encoding='utf-8')
         main_f.write(data)
         main_f.close()
 
         temp_f, temp_f_name = tempfile.mkstemp(suffix='.gir')
-        temp_f = os.fdopen(temp_f, 'w')
+        temp_f = os.fdopen(temp_f, 'w', encoding='utf-8')
         passthrough_gir(main_f_name, temp_f)
         temp_f.close()
         if not utils.files_are_identical(main_f_name, temp_f_name):
@@ -477,7 +478,6 @@ def scanner_main(args):
     writer = Writer(transformer.namespace, shlibs, transformer.get_includes(),
                     exported_packages, options.c_includes)
     data = writer.get_xml()
-
     write_output(data, options)
 
     return 0
