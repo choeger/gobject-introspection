@@ -121,8 +121,7 @@ class XMLWriter(object):
             assert isinstance(line, unicode)
         
         if do_escape:
-            line = escape(line.encode('utf-8')).decode('utf-8')
-        
+            line = escape(line)
         if sys.version < '3':
             line = line.encode('utf-8')
 
@@ -142,9 +141,12 @@ class XMLWriter(object):
             attributes = []
         prefix = '<%s' % (tag_name, )
         if data is not None:
-            if isinstance(data, str):
+            if isinstance(data, str) and sys.version < '3':
                 data = data.decode('UTF-8')
-            suffix = '>%s</%s>' % (escape(data), tag_name)
+			
+            data = escape(data)
+            
+            suffix = '>%s</%s>' % (data, tag_name)
         else:
             suffix = '/>'
         attrs = collect_attributes(
