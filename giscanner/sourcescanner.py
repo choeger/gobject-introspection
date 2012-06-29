@@ -283,24 +283,24 @@ class SourceScanner(object):
                                 stdout=subprocess.PIPE)
 
         for define in defines:
-            proc.stdin.write('#ifndef %s\n' % (define, ))
-            proc.stdin.write('# define %s\n' % (define, ))
-            proc.stdin.write('#endif\n')
+            proc.stdin.write(bytes('#ifndef %s\n' % (define, ), "utf-8"))
+            proc.stdin.write(bytes('# define %s\n' % (define, ), "utf-8"))
+            proc.stdin.write(bytes('#endif\n', "utf-8"))
         for undef in undefs:
-            proc.stdin.write('#undef %s\n' % (undef, ))
+            proc.stdin.write(bytes('#undef %s\n' % (undef, ), "utf-8"))
         for filename in filenames:
             filename = os.path.abspath(filename)
-            proc.stdin.write('#include <%s>\n' % (filename, ))
+            proc.stdin.write(bytes('#include <%s>\n' % (filename, ), "utf-8"))
         proc.stdin.close()
 
         tmp = tempfile.mktemp()
-        fp = open(tmp, 'w+')
+        fp = open(tmp, 'w+', encoding="utf-8")
         while True:
-            data = proc.stdout.read(4096)
+            data = proc.stdout.read(4096)			
             if data is None:
                 break
-            fp.write(data)
-            if len(data) < 4096:
+            fp.write(data.decode("utf-8"))
+            if len(data) == 0:                
                 break
         fp.seek(0, 0)
 
@@ -309,6 +309,8 @@ class SourceScanner(object):
         if proc.returncode != 0:
             raise SystemExit('Error while processing the source.')
 
+        import msvcrt
+        handle = msvcrt.get_osfhandle(fp.fileno())
         self._scanner.parse_file(fp.fileno())
         fp.close()
-        os.unlink(tmp)
+        #os.unlink(tmp)
