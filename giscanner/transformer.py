@@ -241,7 +241,7 @@ currently-scanned namespace is first."""
                 unprefixed_namespaces.append(ns)
         if matches:
             matches.sort(key=lambda x : (x[0] == self._namespace, x[2]))
-            return map(lambda x: (x[0], x[1]), matches)
+            return list(map(lambda x: (x[0], x[1]), matches))
         elif self._accept_unprefixed:
             return [(self._namespace, name)]
         elif unprefixed_namespaces:
