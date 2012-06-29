@@ -442,7 +442,7 @@ class GIRParser(object):
                 return ast.List(name, element_type, ctype=ctype)
             elif name == 'GLib.HashTable':
                 subchildren = self._find_children(typenode, _corens('type'))
-                subchildren_types = map(self._parse_type_simple, subchildren)
+                subchildren_types = list(map(self._parse_type_simple, subchildren))
                 while len(subchildren_types) < 2:
                     subchildren_types.append(ast.TYPE_ANY)
                 return ast.Map(subchildren_types[0],
