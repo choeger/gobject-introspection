@@ -782,7 +782,7 @@ usage is void (*_gtk_reserved1)(void);"""
         # the number of parameter tags (@foo) is the same or greater
         # than the number of signal parameters
         if block and len(block.params) > len(signal.parameters):
-            names = block.params.items()
+            names = list(block.params.items())
             # Resolve real parameter names early, so that in later
             # phase we can refer to them while resolving annotations.
             for i, param in enumerate(signal.parameters):
@@ -1246,7 +1246,7 @@ method or constructor of some type."""
                     continue
                 if len(method.parameters) != len(vfunc.parameters):
                     continue
-                for i in xrange(len(method.parameters)):
+                for i in range(len(method.parameters)):
                     m_type = method.parameters[i].type
                     v_type = vfunc.parameters[i].type
                     if m_type != v_type:
