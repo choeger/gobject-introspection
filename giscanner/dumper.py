@@ -86,8 +86,10 @@ class DumpCompiler(object):
         self._linker_cmd = os.environ.get('CC', self._compiler_cmd)
         self._pkgconfig_cmd = os.environ.get('PKG_CONFIG', 'pkg-config')
 
-        self._uninst_srcdir = os.environ.get(
-            'UNINSTALLED_INTROSPECTION_SRCDIR')
+        self._uninst_srcdir = options.uninst_srcdir
+        if self._uninst_srcdir is None:
+            self._uninst_srcdir = os.environ.get(
+                'UNINSTALLED_INTROSPECTION_SRCDIR')
         self._packages = ['gio-2.0 gmodule-2.0']
         self._packages.extend(options.packages)
 

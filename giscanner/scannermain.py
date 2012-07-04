@@ -163,7 +163,11 @@ match the namespace prefix.""")
     parser.add_option("", "--c-include",
                       action="append", dest="c_includes", default=[],
                       help="headers which should be included in C programs")
+    parser.add_option("", "--uninst-srcdir",
+                      action="store", dest="uninst_srcdir", default=None,
+                      help="Soruce directory to look for data (useful if not installed yet).")
 
+					  
     group = get_preprocessor_option_group(parser)
     parser.add_option_group(group)
 
