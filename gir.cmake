@@ -70,4 +70,4 @@ set(GObject-2.0_INCLUDES GLib-2.0)
 target_scan_gir(GObject-2.0)
 
 list(APPEND static_gir_INCLUDES "${GObject-2.0_GIR}")
-target_add_gir(static_gir "gir/" ${GLib-2.0_gir} ${static_gir_sources})
+target_add_gir(static_gir "gir/" ${GLib-2.0_GIR} ${GObject-2.0_GIR} ${static_gir_sources})

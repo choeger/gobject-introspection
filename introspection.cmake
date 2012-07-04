@@ -13,7 +13,7 @@ macro(target_add_gir name dir)
 		
     add_custom_command(
 	  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${output}"
-	  COMMAND g-ir-compiler ARGS ${f} --includedir=${CMAKE_CURRENT_BINARY_DIR} -o "${CMAKE_CURRENT_BINARY_DIR}/${base}.typelib" --includedir=${include_dir}
+	  COMMAND g-ir-compiler ARGS ${f} --includedir=${CMAKE_CURRENT_BINARY_DIR} -o "${CMAKE_CURRENT_BINARY_DIR}/${output}" --includedir=${include_dir}
 	  MAIN_DEPENDENCY ${f}
 	  DEPENDS ${${name}_INCLUDES}
 	  COMMENT "Compiling gir: ${base}"
@@ -68,14 +68,12 @@ macro(target_scan_gir name)
 	set(${name}_GIR "${CMAKE_CURRENT_BINARY_DIR}/${name}.gir")
 	message(STATUS "name: ${name} -> ${${name}_GIR} dependencies: ${${name}_INCLUDES} -> ${${name}_DEPENDENCIES}")
     add_custom_command(
-	  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${name}.gir"
+	  OUTPUT "${${name}_GIR}"
 	  COMMAND ${PYTHON_EXECUTABLE} ARGS g-ir-scanner.py --namespace=${namespace}
 		--add-include-path="${CMAKE_CURRENT_BINARY_DIR}" --uninst-srcdir="${CMAKE_CURRENT_SOURCE_DIR}"
 		--nsversion=${version} 	${packages} ${includes} ${export_packages} ${program} ${libraries}
 		${${name}_SCANNERFLAGS} ${${name}_CFLAGS} ${${name}_LDFLAGS} ${${name}_FILES} "--output=${${name}_GIR}"		
 	  DEPENDS ${${name}_FILES} ${${name}_DEPENDENCIES}
 	  COMMENT "Scanning gir: ${name}"
-	)
-	
-	set(${name}_gir "${CMAKE_CURRENT_BINARY_DIR}/${name}.gir")
+	)	
 endmacro(target_scan_gir name)
