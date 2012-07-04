@@ -15,7 +15,6 @@ include(introspection.cmake)
 	
 file(GLOB glib_includes ${GLIB_INCLUDE_DIR}/glib/*.h)
 set(GLib-2.0_FILES 
-		${GLIB_INCLUDE_DIR}/gobject/glib-types.h 
 		${GLIB_LIBRARY_DIR}/glib-2.0/include/glibconfig.h 
 		${GLIB_INCLUDE_DIR}/gobject/glib-types.h 
 		${CMAKE_CURRENT_SOURCE_DIR}/gir/glib-2.0.c 
@@ -49,7 +48,8 @@ set(GObject-2.0_FILES gir/gobject-2.0.c)
 file(GLOB gobject_includes ${GLIB_INCLUDE_DIR}/gobject/*.h)
 set(GObject-2.0_FILES 
 		${CMAKE_CURRENT_SOURCE_DIR}/gir/gobject-2.0.c
-		${glib_includes})
+		${gobject_includes})
+list(REMOVE_ITEM GObject-2.0_FILES "${GLIB_INCLUDE_DIR}/gobject/glib-types.h")
 set(GObject-2.0_LIBS ":${GOBJECT_LIBRARY}") #: prefix is probably not portable ...
 set(GObject-2.0_SCANNERFLAGS 
 			--external-library
@@ -59,7 +59,7 @@ set(GObject-2.0_SCANNERFLAGS
             --symbol-prefix=glib
             --c-include="glib-object.h"
 )
-set(GLib-2.0_CFLAGS
+set(GObject-2.0_CFLAGS
             -DGOBJECT_COMPILATION
             -I${GLIB_INCLUDE_DIR}
             -I${GLIB_LIBDIR}/glib-2.0/include
@@ -69,5 +69,5 @@ set(GObject-2.0_INCLUDES GLib-2.0)
 
 target_scan_gir(GObject-2.0)
 
-list(APPEND DBusGLib-1.0_DEPENDENCIES "${CMAKE_CURRENT_BINARY_DIR}/GObject-2.0.gir")
+list(APPEND static_gir_INCLUDES "${GObject-2.0_GIR}")
 target_add_gir(static_gir "gir/" ${GLib-2.0_gir} ${static_gir_sources})

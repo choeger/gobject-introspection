@@ -1,22 +1,24 @@
 macro(target_add_gir name dir)
   set(infiles ${ARGN})
   set(outfiles)
-	
+  message(STATUS "name: ${name} dependencies: ${${name}_INCLUDES}")	
   foreach(gir IN LISTS infiles)
 	message(STATUS "Now on ${gir}")
 
 	get_filename_component(f "${gir}" ABSOLUTE)
-	get_filename_component(include_dir "${f}" PATH)	
-    get_filename_component(base ${f} NAME_WE)
-	message(STATUS "name: ${base} dependencies: ${${base}_DEPENDENCIES}")
+	get_filename_component(include_dir "${f}" PATH)
+    get_filename_component(base ${f} NAME)
+	string(REPLACE "." "_" target ${base})
+	string(REPLACE ".gir" ".typelib" output ${base})
+		
     add_custom_command(
-	  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${base}.typelib"
+	  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${output}"
 	  COMMAND g-ir-compiler ARGS ${f} --includedir=${CMAKE_CURRENT_BINARY_DIR} -o "${CMAKE_CURRENT_BINARY_DIR}/${base}.typelib" --includedir=${include_dir}
 	  MAIN_DEPENDENCY ${f}
-	  DEPENDS ${${base}_DEPENDENCIES}
+	  DEPENDS ${${name}_INCLUDES}
 	  COMMENT "Compiling gir: ${base}"
 	)
-	list(APPEND outfiles "${CMAKE_CURRENT_BINARY_DIR}/${base}.typelib")
+	list(APPEND outfiles "${CMAKE_CURRENT_BINARY_DIR}/${output}")
   endforeach(gir)
   
   add_custom_target(${name}_gir_compile ALL DEPENDS ${outfiles} COMMENT "Compiling typelibs of ${name}")
@@ -56,19 +58,21 @@ macro(target_scan_gir name)
 
 	foreach(incl ${${name}_INCLUDES})
 	    list(APPEND includes "--include=${incl}")
-		list(APPEND ${name}_DEPENDENCIES "${CMAKE_CURRENT_BINARY_DIR}/${name}.gir")
+		list(APPEND ${name}_DEPENDENCIES "${CMAKE_CURRENT_BINARY_DIR}/${incl}.gir")
 	endforeach(incl ${${name}_INCLUDES})
 
 	foreach(exp ${${name}_EXPORT_PACKAGES})
 	    list(APPEND export_packages "--pkg-export=${exp}")
 	endforeach(exp ${${name}_EXPORT_PACKAGES})
     
-	message(STATUS "name: ${name} dependencies: ${${name}_DEPENDENCIES}")
+	set(${name}_GIR "${CMAKE_CURRENT_BINARY_DIR}/${name}.gir")
+	message(STATUS "name: ${name} -> ${${name}_GIR} dependencies: ${${name}_INCLUDES} -> ${${name}_DEPENDENCIES}")
     add_custom_command(
 	  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${name}.gir"
 	  COMMAND ${PYTHON_EXECUTABLE} ARGS g-ir-scanner.py --namespace=${namespace}
+		--add-include-path="${CMAKE_CURRENT_BINARY_DIR}" --uninst-srcdir="${CMAKE_CURRENT_SOURCE_DIR}"
 		--nsversion=${version} 	${packages} ${includes} ${export_packages} ${program} ${libraries}
-		${${name}_SCANNERFLAGS} ${${name}_CFLAGS} ${${name}_LDFLAGS} ${${name}_FILES} "--output=${CMAKE_CURRENT_BINARY_DIR}/${name}.gir"		
+		${${name}_SCANNERFLAGS} ${${name}_CFLAGS} ${${name}_LDFLAGS} ${${name}_FILES} "--output=${${name}_GIR}"		
 	  DEPENDS ${${name}_FILES} ${${name}_DEPENDENCIES}
 	  COMMENT "Scanning gir: ${name}"
 	)
